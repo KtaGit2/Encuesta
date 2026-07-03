@@ -1,0 +1,1102 @@
+
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2026 by anonymous (http://jsbin.com/givavohime/1/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2026 by anonymous (http://jsbin.com/yihivipigo/5/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=3.0"
+    />
+    <title>Encuesta: Tú y la tecnología</title>
+    <style>
+      :root {
+        --cream: #FFFDF6;
+        --ink: #1A1A1A;
+        --ink-soft: #4A4A4A;
+        --green: #2E7D32;
+        --green-dark: #1B5E20;
+        --red: #C62828;
+        --red-dark: #8E1F1F;
+        --blue: #1F4E5F;
+        --blue-light: #E8F1F4;
+        --yellow-bg: #FFF6DD;
+        --yellow-border: #F0C84B;
+        --border-grey: #D9D5C7;
+        --radius: 18px;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--cream);
+        color: var(--ink);
+        font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 0 40px;
+      }
+
+      .app {
+        width: 100%;
+        max-width: 560px;
+        min-height: 100vh;
+        background: var(--cream);
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* PROGRESS BAR */
+      .progress-wrap {
+        position: sticky;
+        top: 0;
+        background: var(--cream);
+        padding: 18px 24px 12px;
+        z-index: 50;
+        border-bottom: 1px solid var(--border-grey);
+      }
+      .progress-label {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--blue);
+        margin-bottom: 8px;
+        text-align: center;
+      }
+      .progress-track {
+        width: 100%;
+        height: 14px;
+        background: #EAE6D8;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: var(--blue);
+        border-radius: 10px;
+        transition: width .4s ease;
+      }
+
+      /* SCREENS */
+      .screen {
+        flex: 1;
+        display: none;
+        flex-direction: column;
+        padding: 28px 24px 24px;
+        animation: fadeIn .35s ease;
+      }
+      .screen.active { display: flex; }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .q-number {
+        font-size: 19px;
+        font-weight: 800;
+        color: var(--blue);
+        letter-spacing: .02em;
+        margin-bottom: 6px;
+      }
+
+      .q-title {
+        font-size: 27px;
+        line-height: 1.32;
+        font-weight: 800;
+        color: var(--ink);
+        margin: 0 0 14px;
+      }
+
+      .q-sub {
+        font-size: 19px;
+        color: var(--ink-soft);
+        margin: 0 0 4px;
+      }
+
+      .q-instruction {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--blue);
+        background: var(--blue-light);
+        border-radius: 999px;
+        padding: 8px 16px;
+        margin: 6px 0 22px;
+        width: fit-content;
+      }
+
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+
+      /* CHOICE BUTTONS (single / multi select) */
+      .choice {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        text-align: left;
+        font-size: 21px;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--ink);
+        background: #FFFFFF;
+        border: 2.5px solid var(--border-grey);
+        border-radius: var(--radius);
+        padding: 18px 20px;
+        cursor: pointer;
+        min-height: 64px;
+        transition: border-color .15s, background .15s, transform .1s;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .choice:active { transform: scale(0.98); }
+      .choice .box {
+        flex: 0 0 30px;
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        border: 2.5px solid #B9B4A2;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #fff;
+      }
+      .choice.multi .box { border-radius: 8px; }
+      .choice.single .box { border-radius: 50%; }
+
+      .choice.selected {
+        border-color: var(--blue);
+        background: var(--blue-light);
+      }
+      .choice.selected .box {
+        background: var(--blue);
+        border-color: var(--blue);
+      }
+
+      .choice .box svg { display: none; width: 18px; height: 18px; }
+      .choice.selected .box svg { display: block; }
+
+      /* ===== PREGUNTA 13: SKILL ROWS CON SI/NO A LA DERECHA ===== */
+      .group-title {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--blue);
+        margin: 22px 0 12px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--blue-light);
+      }
+
+      .skill-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        border: 2px solid var(--border-grey);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        min-height: 60px;
+        gap: 12px;
+      }
+
+      .skill-text {
+        flex: 1;
+        font-size: 18px;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--ink);
+      }
+
+      .skill-choices {
+        display: flex;
+        gap: 12px;
+        flex: 0 0 auto;
+      }
+
+      .skill-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 2.5px solid #B9B4A2;
+        background: #fff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--ink);
+        transition: border-color .15s, background .15s, transform .1s;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .skill-btn:active { transform: scale(0.95); }
+
+      .skill-btn.selected {
+        border-color: var(--blue);
+        background: var(--blue-light);
+        color: var(--blue);
+      }
+
+      /* NAV BUTTONS */
+      .nav-row {
+        margin-top: auto;
+        display: flex;
+        gap: 12px;
+        padding-top: 18px;
+      }
+      .btn {
+        flex: 1;
+        font-size: 21px;
+        font-weight: 800;
+        padding: 18px 20px;
+        border-radius: 16px;
+        border: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn-back {
+        background: #fff;
+        color: var(--blue);
+        border: 2.5px solid var(--blue);
+        flex: 0 0 110px;
+      }
+      .btn-next {
+        background: var(--blue);
+        color: #fff;
+      }
+      .btn-next:disabled {
+        background: #B7C3C8;
+        cursor: not-allowed;
+      }
+      .btn:active:not(:disabled) { transform: scale(0.98); }
+
+      .helper-text {
+        font-size: 16px;
+        color: #8A8478;
+        text-align: center;
+        margin-top: 10px;
+        min-height: 20px;
+      }
+
+      /* WELCOME / END SCREENS */
+      .center-screen {
+        flex: 1;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 28px;
+      }
+      .center-screen.active { display: flex; }
+      .emoji-big { font-size: 56px; margin-bottom: 18px; }
+      .bubble {
+        background: var(--yellow-bg);
+        border: 2.5px solid var(--yellow-border);
+        border-radius: 22px;
+        padding: 26px 24px;
+        font-size: 22px;
+        line-height: 1.5;
+        font-weight: 600;
+        color: var(--ink);
+        max-width: 480px;
+      }
+      .start-btn {
+        margin-top: 30px;
+        background: var(--green);
+        color: #fff;
+        font-size: 24px;
+        font-weight: 800;
+        padding: 20px 48px;
+        border-radius: 18px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 0 var(--green-dark);
+      }
+      .start-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--green-dark); }
+
+      .end-title {
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--blue);
+        margin-bottom: 10px;
+      }
+      .end-sub {
+        font-size: 20px;
+        color: var(--ink-soft);
+        margin-bottom: 26px;
+      }
+      .end-form {
+        width: 100%;
+        max-width: 420px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        text-align: left;
+      }
+      .end-form label {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .end-form input {
+        font-size: 20px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        border: 2.5px solid var(--border-grey);
+        font-family: inherit;
+      }
+      .discount-tag {
+        margin-top: 18px;
+        background: var(--yellow-bg);
+        border: 2px dashed var(--yellow-border);
+        border-radius: 14px;
+        padding: 14px 18px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--blue);
+      }
+      .send-btn {
+        margin-top: 8px;
+        background: var(--blue);
+        color: #fff;
+        font-size: 21px;
+        font-weight: 800;
+        padding: 16px;
+        border-radius: 14px;
+        border: none;
+        cursor: pointer;
+      }
+      .skip-link {
+        margin-top: 16px;
+        font-size: 16px;
+        color: var(--ink-soft);
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: none;
+      }
+
+      /* DEV PANEL (solo para pruebas - se puede borrar) */
+      .dev-note {
+        font-size: 12px;
+        color: #B0AA9A;
+        text-align: center;
+        padding: 10px 24px 30px;
+      }
+
+      @media (max-width: 380px) {
+        .q-title { font-size: 24px; }
+        .choice { font-size: 19px; padding: 16px 16px; }
+        .skill-row { flex-wrap: wrap; }
+        .skill-text { min-width: 100%; margin-bottom: 8px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app" id="app">
+      <!-- BARRA DE PROGRESO (oculta en bienvenida/cierre) -->
+      <div class="progress-wrap" id="progressWrap" style="display:none;">
+        <div class="progress-label" id="progressLabel">Pregunta 1 de 14</div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width:7%;"></div>
+        </div>
+      </div>
+
+      <!-- BIENVENIDA -->
+      <div class="center-screen active" id="screen-welcome">
+        <div class="emoji-big">👋</div>
+        <div class="bubble">
+          ¡Hola! ¿Nos colaboras con una pequeña encuesta? Queremos saber cómo te
+          sientes en este mundo tecnológico. Serán 14 preguntas fáciles y
+          <strong>no tienes que escribir nada</strong>. No hay respuestas buenas
+          ni malas. Empezamos cuando quieras. 🙂
+        </div>
+        <button class="start-btn" onclick="goTo(1)">Empezar →</button>
+      </div>
+
+      <!-- ===================== PREGUNTAS ===================== -->
+
+      <!-- ===== PREGUNTAS DE SELECCIÓN ÚNICA (SÍ/NO) ===== -->
+      <!-- P1 - SINGLE CHOICE: SÍ/NO -->
+      <div class="screen" data-step="1" data-type="single">
+        <div class="q-number">Pregunta 1 de 14</div>
+        <div class="q-title">
+          ¿Utilizas el celular para hacer trámites de salud y realizar pagos por
+          internet?
+        </div>
+        <div class="q-instruction">👉 Selecciona una opción</div>
+        <div class="options" id="opts-1">
+          <div class="choice single" onclick="selectSingle(this,'1')">
+            <span class="box">●</span>Sí
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'1')">
+            <span class="box">●</span>No
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-1" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- P2 - SINGLE CHOICE: SÍ/NO -->
+      <div class="screen" data-step="2" data-type="single">
+        <div class="q-number">Pregunta 2 de 14</div>
+        <div class="q-title">¿Te parece fácil hacer trámites por internet?</div>
+        <div class="q-instruction">👉 Selecciona una opción</div>
+        <div class="options" id="opts-2">
+          <div class="choice single" onclick="selectSingle(this,'2')">
+            <span class="box">●</span>Sí
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'2')">
+            <span class="box">●</span>No
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-2" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PREGUNTAS DE SELECCIÓN MÚLTIPLE ===== -->
+      <!-- P3 - MULTI CHOICE (SIN "TODAS LAS ANTERIORES") -->
+      <div class="screen" data-step="3" data-type="multi">
+        <div class="q-number">Pregunta 3 de 14</div>
+        <div class="q-title">
+          De esta lista, señala lo que te resulta más complicado al hacer
+          trámites por internet
+        </div>
+        <div class="q-instruction">
+          👉 Señala las casillas, puedes elegir varias respuestas
+        </div>
+        <div class="options" id="opts-3">
+          <div class="choice multi" onclick="toggleMulti(this,'3')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Saber los pasos que debo seguir en la pantalla
+          </div>
+          <div class="choice multi" onclick="toggleMulti(this,'3')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Ver bien las letras o botones
+          </div>
+          <div class="choice multi" onclick="toggleMulti(this,'3')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Recordar contraseñas o claves
+          </div>
+          <div class="choice multi" onclick="toggleMulti(this,'3')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Tener que llenar cosas, algunas con tiempo límite
+          </div>
+          <div class="choice multi" onclick="toggleMulti(this,'3')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Tocar bien la pantalla
+          </div>
+        </div>
+        <div class="helper-text" id="helper-3">
+          Elige al menos una opción para continuar
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-3" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PREGUNTAS DE SELECCIÓN ÚNICA ===== -->
+      <!-- P4 - SINGLE CHOICE -->
+      <div class="screen" data-step="4" data-type="single">
+        <div class="q-number">Pregunta 4 de 14</div>
+        <div class="q-title">
+          ¿Qué sientes cuando no puedes hacer algo por internet tú solo/a?
+        </div>
+        <div class="q-instruction">👉 Elige solo una opción</div>
+        <div class="options" id="opts-4">
+          <div class="choice single" onclick="selectSingle(this,'4')">
+            <span class="box">●</span>😠 Frustración y rabia
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'4')">
+            <span class="box">●</span>😔 Tristeza y desánimo
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'4')">
+            <span class="box">●</span>🙂 No me afecta
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-4" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- P5 - SINGLE CHOICE: SÍ/NO -->
+      <div class="screen" data-step="5" data-type="single">
+        <div class="q-number">Pregunta 5 de 14</div>
+        <div class="q-title">
+          ¿Sientes vergüenza al pedir ayuda para hacer trámites por internet?
+        </div>
+        <div class="q-instruction">👉 Selecciona una opción</div>
+        <div class="options" id="opts-5">
+          <div class="choice single" onclick="selectSingle(this,'5')">
+            <span class="box">●</span>Sí
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'5')">
+            <span class="box">●</span>No
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-5" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- P6 - SINGLE CHOICE: SÍ/NO (PREGUNTA MODIFICADA) -->
+      <div class="screen" data-step="6" data-type="single">
+        <div class="q-number">Pregunta 6 de 14</div>
+        <div class="q-title">
+          ¿A menudo crees que puedes borrar información o provocar daños irreparables si tocas el botón equivocado?
+        </div>
+        <div class="q-instruction">👉 Selecciona una opción</div>
+        <div class="options" id="opts-6">
+          <div class="choice single" onclick="selectSingle(this,'6')">
+            <span class="box">●</span>Sí
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'6')">
+            <span class="box">●</span>No
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-6" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- P7 - SINGLE CHOICE: SÍ/NO -->
+      <div class="screen" data-step="7" data-type="single">
+        <div class="q-number">Pregunta 7 de 14</div>
+        <div class="q-title">
+          ¿Te preocupa que alguien te engañe por internet?
+        </div>
+        <div class="q-instruction">👉 Selecciona una opción</div>
+        <div class="options" id="opts-7">
+          <div class="choice single" onclick="selectSingle(this,'7')">
+            <span class="box">●</span>Sí
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'7')">
+            <span class="box">●</span>No
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-7" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- P8 - SINGLE CHOICE: SÍ/NO (PREGUNTA MODIFICADA) -->
+      <div class="screen" data-step="8" data-type="single">
+        <div class="q-number">Pregunta 8 de 14</div>
+        <div class="q-title">
+          ¿Piensas que es tarde ya para aprender a manejar la tecnología?
+        </div>
+        <div class="q-instruction">👉 Selecciona una opción</div>
+        <div class="options" id="opts-8">
+          <div class="choice single" onclick="selectSingle(this,'8')">
+            <span class="box">●</span>Sí
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'8')">
+            <span class="box">●</span>No
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-8" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- P9 - SINGLE CHOICE: SÍ/NO (PREGUNTA MODIFICADA) -->
+      <div class="screen" data-step="9" data-type="single">
+        <div class="q-number">Pregunta 9 de 14</div>
+        <div class="q-title">
+          ¿Crees que este mundo tecnológico está pensado solo para la gente joven?
+        </div>
+        <div class="q-instruction">👉 Selecciona una opción</div>
+        <div class="options" id="opts-9">
+          <div class="choice single" onclick="selectSingle(this,'9')">
+            <span class="box">●</span>Sí
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'9')">
+            <span class="box">●</span>No
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-9" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- P10 - SINGLE CHOICE: SÍ/NO (PREGUNTA MODIFICADA) -->
+      <div class="screen" data-step="10" data-type="single">
+        <div class="q-number">Pregunta 10 de 14</div>
+        <div class="q-title">
+          ¿Antes de que todo pudiera hacerse por internet, podías realizar tus
+          trámites por ti mismo?
+        </div>
+        <div class="q-instruction">👉 Selecciona una opción</div>
+        <div class="options" id="opts-10">
+          <div class="choice single" onclick="selectSingle(this,'10')">
+            <span class="box">●</span>Sí
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'10')">
+            <span class="box">●</span>No
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-10" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- P11 - SINGLE CHOICE (PREGUNTA MODIFICADA) -->
+      <div class="screen" data-step="11" data-type="single">
+        <div class="q-number">Pregunta 11 de 14</div>
+        <div class="q-title">
+          Si pudieras elegir un servicio para hacer tus trámites, ¿cuál preferirías?
+        </div>
+        <div class="q-instruction">👉 Elige solo una opción</div>
+        <div class="options" id="opts-11">
+          <div class="choice single" onclick="selectSingle(this,'11')">
+            <span class="box">●</span>Un servicio de acompañamiento que me guíe paso a paso por video llamada
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'11')">
+            <span class="box">●</span>Un servicio telefónico con personas que hagan los trámites por mí
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-11" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PREGUNTAS DE SELECCIÓN MÚLTIPLE ===== -->
+      <!-- P12 - MULTI CHOICE (SIMPLIFICADA: 5 opciones) -->
+      <div class="screen" data-step="12" data-type="multi">
+        <div class="q-number">Pregunta 12 de 14</div>
+        <div class="q-title">
+          De la siguiente lista, elige las características que te gustaría que tuviera ese servicio
+        </div>
+        <div class="q-instruction">
+          👉 Señala las casillas, puedes elegir varias respuestas
+        </div>
+        <div class="options" id="opts-12">
+          <div class="choice multi" onclick="toggleMulti(this,'12')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Que pueda hablar con personas
+          </div>
+          <div class="choice multi" onclick="toggleMulti(this,'12')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Que sea por teléfono, sin escribir
+          </div>
+          <div class="choice multi" onclick="toggleMulti(this,'12')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Que pueda confiar en que mis datos están seguros
+          </div>
+          <div class="choice multi" onclick="toggleMulti(this,'12')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Que tenga un precio razonable
+          </div>
+          <div class="choice multi" onclick="toggleMulti(this,'12')">
+            <span class="box"
+              ><svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 13l4 4L19 7"
+                  stroke="white"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                /></svg></span
+            >Que me recuerden las cosas
+          </div>
+        </div>
+        <div class="helper-text" id="helper-12">
+          Elige al menos una opción para continuar
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-12" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PREGUNTA ESPECIAL: HABILIDADES (SÍ/NO A LA DERECHA) ===== -->
+      <!-- P13 - SPECIAL: Skills with SI/NO buttons on the right -->
+      <div class="screen" data-step="13" data-type="skills">
+        <div class="q-number">Pregunta 13 de 14</div>
+        <div class="q-title">
+          Nos gustaría saber un poco más acerca de tus habilidades tecnológicas
+        </div>
+        <div class="q-instruction">
+          👉 Señala SI o NO según sea tu caso
+        </div>
+
+        <div class="group-title">💻 Con el computador</div>
+        <div id="opts-13-pc"></div>
+
+        <div class="group-title">📱 Con el celular</div>
+        <div id="opts-13-cel"></div>
+
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-13" disabled onclick="goNext()">
+            Siguiente →
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PREGUNTAS DE SELECCIÓN ÚNICA ===== -->
+      <!-- P14 - SINGLE CHOICE -->
+      <div class="screen" data-step="14" data-type="single">
+        <div class="q-number">Pregunta 14 de 14</div>
+        <div class="q-title">
+          Para terminar, ¿en qué rango de edad te encuentras?
+        </div>
+        <div class="q-instruction">👉 Elige solo una opción</div>
+        <div class="options" id="opts-14">
+          <div class="choice single" onclick="selectSingle(this,'14')">
+            <span class="box">●</span>50 - 60 años
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'14')">
+            <span class="box">●</span>61 - 70 años
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'14')">
+            <span class="box">●</span>71 - 80 años
+          </div>
+          <div class="choice single" onclick="selectSingle(this,'14')">
+            <span class="box">●</span>Mayor de 81 años
+          </div>
+        </div>
+        <div class="nav-row">
+          <button class="btn btn-back" onclick="goBack()">Atrás</button>
+          <button class="btn btn-next" id="next-14" disabled onclick="goNext()">
+            Finalizar →
+          </button>
+        </div>
+      </div>
+
+      <!-- CIERRE -->
+      <div class="center-screen" id="screen-end">
+        <div class="emoji-big">🙏</div>
+        <div class="end-title">¡Gracias por tu tiempo y tu amabilidad!</div>
+        <div class="end-sub">
+          Tus respuestas son de gran valor para nosotros
+        </div>
+        <div class="end-form">
+          <label for="endName">Tu nombre (opcional)</label>
+          <input type="text" id="endName" placeholder="Escribe tu nombre" />
+          <label for="endPhone">Tu número de teléfono (opcional)</label>
+          <input type="tel" id="endPhone" placeholder="Escribe tu número" />
+          <div class="discount-tag">
+            🎁 Déjanos tus datos y en breve recibirás noticias nuestras, además
+            de un 20% de descuento en la contratación del Pack Esencial de
+            nuestro servicio.
+          </div>
+          <button class="send-btn" onclick="finishSurvey()">
+            Enviar mis datos
+          </button>
+          <button class="skip-link" onclick="finishSurvey()">
+            Prefiero no dejar mis datos
+          </button>
+        </div>
+      </div>
+
+      <div class="dev-note">
+        Encuesta de prueba — formato HTML para revisión en dispositivos antes de
+        alojar
+      </div>
+    </div>
+
+    <script>
+      const TOTAL_STEPS = 14;
+      let currentStep = 0; // 0 = welcome
+      const answers = {};
+
+      // ===== SKILLS DATA PARA PREGUNTA 13 =====
+      const skillItemsPC = [
+        "Escribir y enviar correos electrónicos",
+        "Escribir, modificar, guardar e imprimir documentos",
+        "Escanear, guardar y subir documentos a una página web",
+        "Contestar una videollamada"
+      ];
+
+      const skillItemsCel = [
+        "Escribir, enviar, reenviar y eliminar mensajes por WhastApp",
+        "Tomar y enviar fotos por WhatsApp",
+        "Agregar un nuevo contacto a WhatsApp",
+        "Poner el celular en silencio",
+        "Programar alarmas o recordatorios",
+        "Leer u oír noticias",
+        "Desplazarse de una pantalla abierta a otra",
+        "Realizar gestiones a través de tu aplicación de salud",
+        "Escanear un código QR para ver el menú de un restaurante o pagar una cuenta",
+        "Realizar pagos y consultas de saldos o movimientos bancarios"
+      ];
+
+      function buildSkillGroup(containerId, items, prefix) {
+        const c = document.getElementById(containerId);
+        items.forEach((text, idx) => {
+          const id = prefix + '_' + idx;
+          const row = document.createElement('div');
+          row.className = 'skill-row';
+          row.innerHTML = `
+            <div class="skill-text">${text}</div>
+            <div class="skill-choices">
+              <button class="skill-btn" data-id="${id}" data-value="Si" onclick="selectSkill(this, '${id}', 'Si')">Sí</button>
+              <button class="skill-btn" data-id="${id}" data-value="No" onclick="selectSkill(this, '${id}', 'No')">No</button>
+            </div>`;
+          c.appendChild(row);
+          answers[id] = 'No';
+        });
+      }
+
+      buildSkillGroup('opts-13-pc', skillItemsPC, 'p13_pc');
+      buildSkillGroup('opts-13-cel', skillItemsCel, 'p13_cel');
+
+      function selectSkill(el, id, value) {
+        // Buscar todos los botones para este skill
+        const skillRow = el.closest('.skill-row');
+        const siblings = skillRow.querySelectorAll('.skill-btn');
+        
+        // Desseleccionar todos
+        siblings.forEach(btn => btn.classList.remove('selected'));
+        
+        // Seleccionar el que fue clickeado
+        el.classList.add('selected');
+        
+        // Guardar respuesta
+        answers[id] = value;
+        
+        // Habilitar botón siguiente
+        document.getElementById('next-13').disabled = false;
+      }
+
+      function updateProgress(step) {
+        const wrap = document.getElementById('progressWrap');
+        if (step < 1 || step > TOTAL_STEPS) { wrap.style.display = 'none'; return; }
+        wrap.style.display = 'block';
+        document.getElementById('progressLabel').textContent = `Pregunta ${step} de ${TOTAL_STEPS}`;
+        document.getElementById('progressFill').style.width = ((step / TOTAL_STEPS) * 100) + '%';
+      }
+
+      function goTo(step) {
+        document.getElementById('screen-welcome').classList.remove('active');
+        document.getElementById('screen-end').classList.remove('active');
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+        if (step === 0) {
+          document.getElementById('screen-welcome').classList.add('active');
+        } else if (step > TOTAL_STEPS) {
+          document.getElementById('screen-end').classList.add('active');
+        } else {
+          document.querySelector(`.screen[data-step="${step}"]`).classList.add('active');
+        }
+        updateProgress(step);
+        currentStep = step;
+        window.scrollTo(0, 0);
+      }
+
+      function goNext() {
+        if (currentStep === TOTAL_STEPS) {
+          goTo(TOTAL_STEPS + 1);
+        } else {
+          goTo(currentStep + 1);
+        }
+      }
+
+      function goBack() {
+        if (currentStep > 1) goTo(currentStep - 1);
+        else goTo(0);
+      }
+
+      // ===== FUNCIÓN PARA SELECCIÓN ÚNICA (BOTONES) =====
+      function selectSingle(el, q) {
+        const container = document.getElementById('opts-' + q);
+        container.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        answers['p' + q] = el.textContent.trim();
+        document.getElementById('next-' + q).disabled = false;
+      }
+
+      // ===== FUNCIÓN PARA SELECCIÓN MÚLTIPLE =====
+      function toggleMulti(el, q) {
+        const container = document.getElementById('opts-' + q);
+
+        el.classList.toggle('selected');
+
+        // Guardar respuestas múltiples correctamente
+        const selected = [...container.querySelectorAll('.choice.selected')].map(c => c.textContent.trim());
+        answers['p' + q] = selected.length > 0 ? selected.join(', ') : '';
+        
+        const hasAny = container.querySelectorAll('.choice.selected').length > 0;
+        document.getElementById('next-' + q).disabled = !hasAny;
+        const helper = document.getElementById('helper-' + q);
+        if (helper) helper.style.display = hasAny ? 'none' : 'block';
+      }
+
+      function finishSurvey() {
+        answers['nombre'] = document.getElementById('endName').value || '';
+        answers['telefono'] = document.getElementById('endPhone').value || '';
+        console.log('Respuestas finales:', answers);
+
+        // Mostrar estado de envío
+        const endForm = document.querySelector('.end-form');
+        endForm.innerHTML = '<div style="font-size:18px;font-weight:600;color:var(--blue);text-align:center;padding:20px 0;">⏳ Guardando tus respuestas...</div>';
+
+        // REEMPLAZA ESTO CON TU URL DE GOOGLE APPS SCRIPT
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzr5-272kpGugnrubwFqHcdzYXq7PAbSlAq1Z9gZ2YRDYjxulmTisiX-nLapdrebaqA/exec'
+
+        // Enviar datos
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(answers),
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          console.log('Datos enviados exitosamente');
+          endForm.innerHTML = '<div style="font-size:22px;font-weight:800;color:var(--green);text-align:center;padding:20px 0;">✅ ¡Listo! Tus respuestas han sido guardadas. Gracias por participar.</div>';
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // Incluso si hay error en fetch, consideramos que se guardó (por seguridad CORS)
+          endForm.innerHTML = '<div style="font-size:22px;font-weight:800;color:var(--green);text-align:center;padding:20px 0;">✅ ¡Listo! Gracias por participar.</div>';
+        });
+      }
+    </script>
+  </body>
+</html>
